@@ -18,7 +18,7 @@ import javax.swing.event.DocumentListener;
 public class accountSetup extends JFrame implements ActionListener {
     private JPanel cards, panelAccountSetup, panelNext;
     private CardLayout cardLayout;
-    private JTextField txtCity, txtPostalCode, txtFirstName;
+    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName;
     private JPopupMenu cityPopup;
     private LagunaSearch citySearch;
     private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName, lblLastName;
@@ -242,28 +242,35 @@ public class accountSetup extends JFrame implements ActionListener {
         pnlPage2SetUp.setLayout(null);
         panel.add(pnlPage2SetUp);
         
+        lblLastName = new JLabel("Last Name*");
+        lblLastName.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblLastName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblLastName.setBounds(30, 10, 90, 10);
+        pnlPage2SetUp.add(lblLastName);
+        
+        txtLastName = new JTextField();
+        txtLastName.setBounds(35, 30, 200, 35);
+        txtLastName.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtLastName.setBorder(BorderFactory.createCompoundBorder(
+                txtLastName.getBorder(),
+                new EmptyBorder(13, 5, 2, 5)
+        ));
+        pnlPage2SetUp.add(txtLastName);
+        
         lblFirstName = new JLabel("First Name*");
         lblFirstName.setFont(new Font("Arial", Font.PLAIN, 15));
         lblFirstName.setHorizontalAlignment(SwingConstants.CENTER);
-        lblFirstName.setBounds(30, 10, 90, 10);
+        lblFirstName.setBounds(280, 10, 90, 10);
         pnlPage2SetUp.add(lblFirstName);
         
         txtFirstName = new JTextField();
-        txtFirstName.setBounds(35, 30, 200, 35);
+        txtFirstName.setBounds(280, 30, 200, 35);
         txtFirstName.setFont(new Font("Arial", Font.PLAIN, 15));
         txtFirstName.setBorder(BorderFactory.createCompoundBorder(
                 txtFirstName.getBorder(),
                 new EmptyBorder(13, 5, 2, 5)
         ));
         pnlPage2SetUp.add(txtFirstName);
-        
-        lblLastName = new JLabel("Last Name");
-        lblLastName.setFont(new Font("Arial", Font.PLAIN, 15));
-        lblLastName.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLastName.setBounds(190, 10, 90, 10);
-        pnlPage2SetUp.add(lblLastName);
-
-        
         
         
 
