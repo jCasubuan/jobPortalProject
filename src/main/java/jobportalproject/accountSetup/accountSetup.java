@@ -16,15 +16,29 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class accountSetup extends JFrame implements ActionListener {
-    private JPanel cards, panelAccountSetup, panelNext;
+    private JPanel cards, panelAccountSetup, panelNext, panelLastPage;
     private CardLayout cardLayout;
-    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName, txtMiddlename, txtSuffix, txtContactNum, txtEmail;
+    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName, txtMiddlename, txtSuffix, txtContactNum, txtEmail, txtCitizenship;
     private JPopupMenu cityPopup;
     private LagunaSearch citySearch;
-    private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName, lblLastName, lblMiddleName, lblSuffix, lblContact, lblRequiredPage2, lblPlusContact, lblEmail, lblGender;
-    private JButton btnContinue, btnBack;
+    private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName, lblLastName, lblMiddleName, lblSuffix, lblContact, lblRequiredPage2, lblPlusContact, lblEmail, lblGender, lblBirthDate, lblCitizenship, lblStatus, lblPage2;
+    private JButton btnContinue, btnBack, btnBackPage2, btnContinuePage2;
     private String[] genders = {"Choose your gender", "Male", "Female", "Others", "Prefer not to say"};
-    private JComboBox<String> genderDropDown;
+    private Integer[] birthYear = {0, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008,
+                                2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990,
+                                1989, 1988, 1987, 1986, 1985, 1984, 1983, 1982, 1981, 1980, 1979, 1978, 1977, 1976, 1975, 1974, 1973, 1972,
+                                1971, 1970, 1969, 1968, 1967, 1966, 1965, 1964, 1963, 1962, 1961, 1960, 1959, 1958, 1957, 1956, 1955, 1954,
+                                1953, 1952, 1951, 1950, 1949, 1948, 1947, 1946, 1945, 1944, 1943, 1942, 1941, 1940, 1939, 1938, 1937, 1936,
+                                1935, 1934, 1933, 1932, 1931, 1930, 1929, 1928, 1927, 1926, 1925, 1924, 1923, 1922, 1921, 1920, 1919, 1918,
+                                1917, 1916, 1915, 1914, 1913, 1912, 1911, 1910, 1909, 1908, 1907, 1906, 1905, 1904, 1903, 1902, 1901, 1900};
+    private String[] birthMonth = {"Months", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", 
+                                    "December"};
+    private Integer[] birthDay = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 
+                                    25, 26, 27, 28, 29, 30, 31};
+    private String[] status = {"Choose your Status", "Single", "Married", "Widowed", "Separated", "Divorced", "Prefer not to disclose"};
+    private JComboBox<String> jcbGender, jcbBirthMonth, jcbStatus;
+    private JComboBox<Integer> jcbBirthYear, jcbBirthDay;
+    
 
     public accountSetup() {
         setTitle("Account Setup");
@@ -66,10 +80,13 @@ public class accountSetup extends JFrame implements ActionListener {
         // Create Panels
         panelAccountSetup = createAccountSetupPanel();
         panelNext = createNextPanel();
+        panelLastPage = createLastPanel();
+        
 
         // Add Panels to CardLayout
         cards.add(panelAccountSetup, "AccountSetup");
         cards.add(panelNext, "Next");
+        cards.add(panelLastPage, "Last");
 
         // Add Cards to JFrame
         add(cards);
@@ -239,7 +256,7 @@ public class accountSetup extends JFrame implements ActionListener {
         lblInfoPage2.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(lblInfoPage2);
         
-        lblRequiredPage2 = new JLabel("*Required field");
+        lblRequiredPage2 = new JLabel("*Required fields");
         lblRequiredPage2.setBounds(325, 115, 120, 35);
         lblRequiredPage2.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(lblRequiredPage2);
@@ -363,20 +380,100 @@ public class accountSetup extends JFrame implements ActionListener {
         ));
         pnlPage2SetUp.add(txtEmail);
         
-        lblGender = new JLabel("Gender");
+        lblGender = new JLabel("Gender*");
         lblGender.setFont(new Font("Arial", Font.PLAIN, 15));
-        lblGender.setBounds(670, 115, 70, 20);
+        lblGender.setBounds(630, 115, 70, 20);
         pnlPage2SetUp.add(lblGender);
         
-        genderDropDown = new JComboBox<>(genders);
-        genderDropDown.setBounds(630, 148, 148, 35);
-        pnlPage2SetUp.add(genderDropDown);
+        jcbGender = new JComboBox<>(genders);
+        jcbGender.setBounds(630, 148, 148, 35);
+        pnlPage2SetUp.add(jcbGender);
+        
+        
+        lblBirthDate = new JLabel("Date of Birth*");
+        lblBirthDate.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblBirthDate.setBounds(12, 230, 140, 35);
+        pnlPage2SetUp.add(lblBirthDate);
+        
+        jcbBirthMonth = new JComboBox<>(birthMonth);
+        jcbBirthMonth.setBounds(12, 275, 90, 30);
+        pnlPage2SetUp.add(jcbBirthMonth);
+        
+        jcbBirthDay= new JComboBox<>(birthDay);
+        jcbBirthDay.setBounds(120, 275, 45, 30);
+        pnlPage2SetUp.add(jcbBirthDay);
+        
+        jcbBirthYear = new JComboBox<>(birthYear);
+        jcbBirthYear.setBounds(180, 275, 60, 30);
+        pnlPage2SetUp.add(jcbBirthYear);
+        
+        lblCitizenship = new JLabel("Citizenship*");
+        lblCitizenship.setBounds(335, 230, 140, 35);
+        lblCitizenship.setFont(new Font("Arial", Font.PLAIN, 15));
+        pnlPage2SetUp.add(lblCitizenship);
+        
+        txtCitizenship = new JTextField();
+        txtCitizenship.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtCitizenship.setBounds(330, 270, 160, 35);
+        txtCitizenship.setBorder(BorderFactory.createCompoundBorder(
+                txtCitizenship.getBorder(),
+                new EmptyBorder(10, 3, 2, 5)
+        ));
+        pnlPage2SetUp.add(txtCitizenship);
+        
+        lblStatus = new JLabel("Status*");
+        lblStatus.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblStatus.setBounds(580, 230, 100, 35);
+        pnlPage2SetUp.add(lblStatus);
+        
+        jcbStatus = new JComboBox<>(status);
+        jcbStatus.setBounds(580, 270, 150, 35);
+        pnlPage2SetUp.add(jcbStatus);
+        
+        btnBackPage2 = new JButton("Back");
+        btnBackPage2.setBackground(Color.WHITE);
+        btnBackPage2.setForeground(new Color(0, 119, 212));
+        btnBackPage2.setFont(new Font("Arial", Font.BOLD, 12));
+        btnBackPage2.setBounds(15, 400, 80, 30);
+        btnBackPage2.setFocusPainted(false);
+        pnlPage2SetUp.add(btnBackPage2);
+               
+        lblPage2 = new JLabel("page 2 of 3 ");
+        lblPage2.setFont(new Font("Arial", Font.PLAIN, 12));
+        lblPage2.setBounds(320, 430, 90, 15);
+        lblPage2.setHorizontalAlignment(SwingConstants.CENTER);
+        pnlPage2SetUp.add(lblPage2);
+        
+        btnContinuePage2 = new JButton("Continue ");
+        btnContinuePage2.setBorder(new LineBorder(new Color(0, 119, 212), 2, true));
+        btnContinuePage2.setBackground(new Color(0, 119, 212));
+        btnContinuePage2.setForeground(Color.white);
+        btnContinuePage2.setFont(new Font("Arial", Font.BOLD, 16));
+        btnContinuePage2.setBounds(670, 380, 100, 50);
+        btnContinuePage2.setBorderPainted(false);
+        btnContinuePage2.setFocusPainted(false);
+        btnContinuePage2.setOpaque(true);
+        pnlPage2SetUp.add(btnContinuePage2);
+        
+        
+        btnBackPage2.addActionListener(this);
+        btnContinuePage2.addActionListener(this);
+        
+        
+        return panel;
+    }
+    
+    private JPanel createLastPanel(){
+        JPanel panel = new JPanel(null);
+        
         
         
         
         
         return panel;
+        
     }
+    
 
     private void updateCitySuggestions() {
     try {
@@ -437,7 +534,7 @@ public class accountSetup extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Continue")) {
+        if (e.getSource() == btnContinue) {
             
             String city = txtCity.getText().trim();
             if (city.isEmpty()){
@@ -458,8 +555,40 @@ public class accountSetup extends JFrame implements ActionListener {
             new firstTimeInterface().setVisible(true);
             dispose();
         }
+        else if (e.getSource() == btnBackPage2){
+            cardLayout.show(cards, "AccountSetup");
+        }
+        
+        else if (e.getSource() == btnContinuePage2){
+           
+            String inputLname = txtLastName.getText().trim();
+            String inputFname = txtFirstName.getText().trim();
+            String inputMname = txtMiddlename.getText().trim();
+            String inputSuffix = txtSuffix.getText().trim();
+            String inputContact = txtContactNum.getText().trim();
+            String inputEmail = txtEmail.getText().trim();
+
+            String jcbGenValue = (String) jcbGender.getSelectedItem();
+            String jcbMonthValue = (String) jcbBirthMonth.getSelectedItem();
+            int jcbDayValue = jcbBirthDay.getSelectedIndex();
+            int jcbYearValue = jcbBirthYear.getSelectedIndex();
+            String jcbStatusValue = (String) jcbStatus.getSelectedItem();
+            
+            if (inputLname.isEmpty() || inputFname.isEmpty() || inputContact.isEmpty() || inputEmail.isEmpty() || 
+            jcbGenValue.equals("Choose your gender") || jcbMonthValue.equals("Months") || 
+            jcbDayValue == 0 || jcbYearValue == 0 || jcbStatusValue.equals("Choose your Status")){
+                
+                JOptionPane.showMessageDialog(this, "Fields cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                
+            }
+            
+            
+            
+            
+        }
         
     }
+    // e.getActionCommand().equals("Continue")
 
     // Laguna City Search Implementation
     private class LagunaSearch {
