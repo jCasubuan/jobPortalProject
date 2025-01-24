@@ -18,11 +18,13 @@ import javax.swing.event.DocumentListener;
 public class accountSetup extends JFrame implements ActionListener {
     private JPanel cards, panelAccountSetup, panelNext;
     private CardLayout cardLayout;
-    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName;
+    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName, txtMiddlename, txtSuffix, txtContactNum, txtEmail;
     private JPopupMenu cityPopup;
     private LagunaSearch citySearch;
-    private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName, lblLastName;
+    private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName, lblLastName, lblMiddleName, lblSuffix, lblContact, lblRequiredPage2, lblPlusContact, lblEmail, lblGender;
     private JButton btnContinue, btnBack;
+    private String[] genders = {"Choose your gender", "Male", "Female", "Others", "Prefer not to say"};
+    private JComboBox<String> genderDropDown;
 
     public accountSetup() {
         setTitle("Account Setup");
@@ -87,7 +89,7 @@ public class accountSetup extends JFrame implements ActionListener {
         lblInfo = new JLabel("We use this to match you with jobs nearby.");
         lblInfo.setFont(new Font("Arial", Font.PLAIN, 17));
         lblInfo.setForeground(Color.GRAY);
-        lblInfo.setBounds(390, 120, 350, 20);
+        lblInfo.setBounds(385, 120, 350, 20);
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(lblInfo);
 
@@ -107,9 +109,9 @@ public class accountSetup extends JFrame implements ActionListener {
         ));
         panel.add(txtCity);
         
-        lblRequired = new JLabel("*Required");
-        lblRequired.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblRequired.setBounds(400, 265, 60, 15);
+        lblRequired = new JLabel("*Required field");
+        lblRequired.setFont(new Font("Arial", Font.BOLD, 12));
+        lblRequired.setBounds(400, 265, 120, 15);
         panel.add(lblRequired);
         
         
@@ -219,7 +221,8 @@ public class accountSetup extends JFrame implements ActionListener {
         
         return panel;
     }
-
+        
+        // Next page panel
     private JPanel createNextPanel() {
         JPanel panel = new JPanel(null);
         
@@ -232,24 +235,29 @@ public class accountSetup extends JFrame implements ActionListener {
         lblInfoPage2 = new JLabel("We use these information to know you more.");
         lblInfoPage2.setFont(new Font("Arial", Font.PLAIN, 17));
         lblInfoPage2.setForeground(Color.GRAY);
-        lblInfoPage2.setBounds(500, 90, 350, 20);
+        lblInfoPage2.setBounds(495, 90, 350, 20);
         lblInfoPage2.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(lblInfoPage2);
         
+        lblRequiredPage2 = new JLabel("*Required field");
+        lblRequiredPage2.setBounds(325, 115, 120, 35);
+        lblRequiredPage2.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblRequiredPage2);
+        
         JPanel pnlPage2SetUp = new JPanel();
-        pnlPage2SetUp.setBounds(120, 150, 1260, 550);
-        pnlPage2SetUp.setBorder(new LineBorder(Color.GRAY, 1));
+        pnlPage2SetUp.setBounds(340, 190, 830, 500);
+        //pnlPage2SetUp.setBorder(new LineBorder(Color.GRAY, 1));
         pnlPage2SetUp.setLayout(null);
         panel.add(pnlPage2SetUp);
         
         lblLastName = new JLabel("Last Name*");
         lblLastName.setFont(new Font("Arial", Font.PLAIN, 15));
         lblLastName.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLastName.setBounds(30, 10, 90, 10);
+        lblLastName.setBounds(5, 10, 90, 10);
         pnlPage2SetUp.add(lblLastName);
         
         txtLastName = new JTextField();
-        txtLastName.setBounds(35, 30, 200, 35);
+        txtLastName.setBounds(10, 40, 200, 35);
         txtLastName.setFont(new Font("Arial", Font.PLAIN, 15));
         txtLastName.setBorder(BorderFactory.createCompoundBorder(
                 txtLastName.getBorder(),
@@ -260,11 +268,11 @@ public class accountSetup extends JFrame implements ActionListener {
         lblFirstName = new JLabel("First Name*");
         lblFirstName.setFont(new Font("Arial", Font.PLAIN, 15));
         lblFirstName.setHorizontalAlignment(SwingConstants.CENTER);
-        lblFirstName.setBounds(280, 10, 90, 10);
+        lblFirstName.setBounds(240, 10, 90, 10);
         pnlPage2SetUp.add(lblFirstName);
         
         txtFirstName = new JTextField();
-        txtFirstName.setBounds(280, 30, 200, 35);
+        txtFirstName.setBounds(240, 40, 200, 35);
         txtFirstName.setFont(new Font("Arial", Font.PLAIN, 15));
         txtFirstName.setBorder(BorderFactory.createCompoundBorder(
                 txtFirstName.getBorder(),
@@ -272,8 +280,101 @@ public class accountSetup extends JFrame implements ActionListener {
         ));
         pnlPage2SetUp.add(txtFirstName);
         
+        lblMiddleName = new JLabel("Middle Name (Optional)");
+        lblMiddleName.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblMiddleName.setHorizontalAlignment(SwingConstants.CENTER);
+        lblMiddleName.setBounds(475, 5, 170, 20);
+        pnlPage2SetUp.add(lblMiddleName);
         
-
+        txtMiddlename = new JTextField();
+        txtMiddlename.setBounds(470, 40, 200, 35);
+        txtMiddlename.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtMiddlename.setBorder(BorderFactory.createCompoundBorder(
+                txtMiddlename.getBorder(),
+                new EmptyBorder(13, 5, 2, 5)
+        ));
+        pnlPage2SetUp.add(txtMiddlename);
+        
+        lblSuffix = new JLabel("Suffix (e.g., jr., III)");
+        lblSuffix.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblSuffix.setHorizontalAlignment(SwingConstants.CENTER);
+        lblSuffix.setBounds(655, 5, 190, 20);
+        pnlPage2SetUp.add(lblSuffix);
+        
+        txtSuffix = new JTextField();
+        txtSuffix.setBounds(720, 40, 80, 35);
+        txtSuffix.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtSuffix.setBorder(BorderFactory.createCompoundBorder(
+                txtSuffix.getBorder(),
+                new EmptyBorder(13, 5, 2, 5)
+        ));
+        pnlPage2SetUp.add(txtSuffix);
+        
+        lblContact = new JLabel("Contact No.*");
+        lblContact.setFont(new Font("Arial", Font.PLAIN, 15));
+        //lblContact.setHorizontalAlignment(SwingConstants.CENTER);
+        lblContact.setBounds(12, 115, 180, 20);
+        pnlPage2SetUp.add(lblContact);
+        
+        lblPlusContact = new JLabel("(+63)");
+        lblPlusContact.setFont(new Font("Arial", Font.PLAIN, 15));
+        //lblPlusContact.setHorizontalAlignment(SwingConstants.CENTER);
+        lblPlusContact.setBounds(12, 161, 50, 20);
+        pnlPage2SetUp.add(lblPlusContact);
+        
+        txtContactNum = new JTextField();
+        txtContactNum.setBounds(52, 150, 160, 35);
+        txtContactNum.setFont(new Font("Arial", Font.PLAIN, 15));
+        txtContactNum.setBorder(BorderFactory.createCompoundBorder(
+                txtContactNum.getBorder(),
+                new EmptyBorder(10, 3, 2, 5)
+        ));
+        
+        
+        txtContactNum.addKeyListener(new KeyAdapter() {
+            public void keyReleased (KeyEvent e) {
+                String input  = txtContactNum.getText();
+                
+                if (!input.isEmpty()){
+                    String formatted = accountSetup.formatPhoneNumber(input);
+                    
+                    if (!input.equals(formatted)){
+                        txtContactNum.setText(formatted);
+                        
+                        txtContactNum.setCaretPosition(formatted.length());
+                    }
+                }
+            }
+        });
+        
+        pnlPage2SetUp.add(txtContactNum);
+        
+        lblEmail = new JLabel("Email Address*");
+        lblEmail.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblEmail.setBounds(265, 115, 160, 20);
+        pnlPage2SetUp.add(lblEmail);
+        
+        txtEmail = new JTextField();
+        txtEmail.setFont(new Font("Arial", Font.PLAIN, 13));
+        txtEmail.setBounds(260, 150, 320, 35);
+        txtEmail.setBorder(BorderFactory.createCompoundBorder(
+                txtEmail.getBorder(),
+                new EmptyBorder(13, 2, 2, 9)
+        ));
+        pnlPage2SetUp.add(txtEmail);
+        
+        lblGender = new JLabel("Gender");
+        lblGender.setFont(new Font("Arial", Font.PLAIN, 15));
+        lblGender.setBounds(670, 115, 70, 20);
+        pnlPage2SetUp.add(lblGender);
+        
+        genderDropDown = new JComboBox<>(genders);
+        genderDropDown.setBounds(630, 148, 148, 35);
+        pnlPage2SetUp.add(genderDropDown);
+        
+        
+        
+        
         return panel;
     }
 
@@ -361,7 +462,7 @@ public class accountSetup extends JFrame implements ActionListener {
     }
 
     // Laguna City Search Implementation
-    class LagunaSearch {
+    private class LagunaSearch {
         private List<String> cities;
 
         public LagunaSearch() {
@@ -390,6 +491,34 @@ public class accountSetup extends JFrame implements ActionListener {
         }
 
     }
+    
+     public static String formatPhoneNumber(String input) {
+        // Only remove spaces and non-digits
+        String cleaned = input.replaceAll("[^0-9]", "");
+        
+        // Don't format if less than 3 digits
+        if (cleaned.length() < 3) return cleaned;
+        
+        StringBuilder formatted = new StringBuilder();
+        
+        // Format the number in parts
+        if (cleaned.length() >= 3) {
+            formatted.append(cleaned.substring(0, 3));
+        }
+        
+        if (cleaned.length() >= 4) {
+            formatted.append(" ");
+            formatted.append(cleaned.substring(3, Math.min(6, cleaned.length())));
+        }
+        
+        if (cleaned.length() >= 7) {
+            formatted.append(" ");
+            formatted.append(cleaned.substring(6, Math.min(10, cleaned.length())));
+        }
+        
+        return formatted.toString();
+    }
+      
 }
 
 
