@@ -6,6 +6,7 @@ package jobportalproject.accountSetup;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +34,6 @@ public class accountSetup extends JFrame implements ActionListener {
                                 1917, 1916, 1915, 1914, 1913, 1912, 1911, 1910, 1909, 1908, 1907, 1906, 1905, 1904, 1903, 1902, 1901, 1900};
     private String[] birthMonth = {"Months", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", 
                                     "December"};
-    private Integer[] birthDay = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 
-                                    25, 26, 27, 28, 29, 30, 31};
     private String[] status = {"Choose your Status", "Single", "Married", "Widowed", "Separated", "Divorced", "Prefer not to disclose"};
     private JComboBox<String> jcbGender, jcbBirthMonth, jcbStatus;
     private JComboBox<Integer> jcbBirthYear, jcbBirthDay;
@@ -399,7 +398,8 @@ public class accountSetup extends JFrame implements ActionListener {
         jcbBirthMonth.setBounds(12, 275, 90, 30);
         pnlPage2SetUp.add(jcbBirthMonth);
         
-        jcbBirthDay= new JComboBox<>(birthDay);
+        jcbBirthDay= new JComboBox<>();
+        jcbBirthDay.addItem(0);
         jcbBirthDay.setBounds(120, 275, 45, 30);
         pnlPage2SetUp.add(jcbBirthDay);
         
@@ -455,6 +455,9 @@ public class accountSetup extends JFrame implements ActionListener {
         btnContinuePage2.setOpaque(true);
         pnlPage2SetUp.add(btnContinuePage2);
         
+        jcbBirthMonth.addActionListener(e -> updateDays());
+        jcbBirthYear.addActionListener(e -> updateDays());
+        
         
         btnBackPage2.addActionListener(this);
         btnContinuePage2.addActionListener(this);
@@ -476,7 +479,7 @@ public class accountSetup extends JFrame implements ActionListener {
     
 
     private void updateCitySuggestions() {
-    try {
+        try {
         String input = txtCity.getText().trim().toLowerCase();
 
         if (input.isEmpty()) {
@@ -489,29 +492,44 @@ public class accountSetup extends JFrame implements ActionListener {
         cityPopup.removeAll(); // Clear existing items
 
         if (!suggestions.isEmpty()) {
-            for (String city : suggestions) {
-                if (city.toLowerCase().startsWith(input)) {
-                    JMenuItem item = new JMenuItem(city);
-                    item.setFont(new Font("Arial", Font.PLAIN, 14));
-                    item.setBackground(Color.WHITE);
+            int maxDisplayCount = 6; // Limit to 6 items
+            JPanel suggestionPanel = new JPanel();
+            suggestionPanel.setLayout(new BoxLayout(suggestionPanel, BoxLayout.Y_AXIS));
+            suggestionPanel.setBackground(Color.WHITE);
 
-                    item.addActionListener(e -> {
-                        txtCity.setText(city);
+            for (int i = 0; i < Math.min(suggestions.size(), maxDisplayCount); i++) {
+                String city = suggestions.get(i);
+
+                JMenuItem item = new JMenuItem(city);
+                item.setFont(new Font("Arial", Font.PLAIN, 14));
+                item.setBackground(Color.WHITE);
+
+                item.addActionListener(e -> {
+                    txtCity.setText(city);
+                    cityPopup.setVisible(false);
+                    cityPopup.removeAll(); // Clear popup immediately after selection
+                    txtCity.requestFocusInWindow(); // Maintain focus on text field
+                    SwingUtilities.invokeLater(() -> {
                         cityPopup.setVisible(false);
-                        cityPopup.removeAll(); // Clear popup immediately after selection
-                        txtCity.requestFocusInWindow(); // Maintain focus on text field
-                        // Force popup to dispose
-                        SwingUtilities.invokeLater(() -> {
-                            cityPopup.setVisible(false);
-                            cityPopup.removeAll();
-                        });
+                        cityPopup.removeAll();
                     });
+                });
 
-                    cityPopup.add(item);
-                }
+                suggestionPanel.add(item);
             }
 
-            if (cityPopup.getComponentCount() > 0 && txtCity.isShowing()) {
+            // Adjust height dynamically based on the number of items
+            int suggestionHeight = Math.min(suggestions.size(), maxDisplayCount) * 25; // Assume each item is ~25px tall
+            JScrollPane scrollPane = new JScrollPane(suggestionPanel);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setVerticalScrollBarPolicy(
+                suggestions.size() > maxDisplayCount ? JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED : JScrollPane.VERTICAL_SCROLLBAR_NEVER
+            );
+            scrollPane.setPreferredSize(new Dimension(txtCity.getWidth(), suggestionHeight));
+
+            cityPopup.add(scrollPane);
+
+            if (txtCity.isShowing()) {
                 Point p = txtCity.getLocationOnScreen();
                 cityPopup.pack();
                 cityPopup.setLocation(p.x, p.y + txtCity.getHeight());
@@ -531,6 +549,33 @@ public class accountSetup extends JFrame implements ActionListener {
         cityPopup.removeAll();
     }
 }
+
+
+    
+    private void updateDays(){
+        int monthIndex = jcbBirthMonth.getSelectedIndex(); // get Selected month index
+        int year = (Integer) jcbBirthYear.getSelectedItem();
+        
+        if (monthIndex == 0 || year == 0){
+            jcbBirthDay.removeAllItems();
+            jcbBirthDay.addItem(0);
+            
+            return;
+        }
+        
+        // Calculate the number of days in the selected month and year
+        YearMonth yearMonth = YearMonth.of(year, monthIndex);
+        int daysInMonth = yearMonth.lengthOfMonth();
+        
+        // Update day JComboBox
+        jcbBirthDay.removeAllItems();
+        jcbBirthDay.addItem(0);
+        for (int day = 1; day <= daysInMonth; day++){
+            jcbBirthDay.addItem(day);
+        }
+        
+        
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -560,35 +605,68 @@ public class accountSetup extends JFrame implements ActionListener {
         }
         
         else if (e.getSource() == btnContinuePage2){
-           
             String inputLname = txtLastName.getText().trim();
             String inputFname = txtFirstName.getText().trim();
             String inputMname = txtMiddlename.getText().trim();
             String inputSuffix = txtSuffix.getText().trim();
             String inputContact = txtContactNum.getText().trim();
             String inputEmail = txtEmail.getText().trim();
+            String inputCitizenship = txtCitizenship.getText().trim();
 
             String jcbGenValue = (String) jcbGender.getSelectedItem();
             String jcbMonthValue = (String) jcbBirthMonth.getSelectedItem();
             int jcbDayValue = jcbBirthDay.getSelectedIndex();
-            int jcbYearValue = jcbBirthYear.getSelectedIndex();
+            int jcbYearValue = (int) jcbBirthYear.getSelectedItem();
             String jcbStatusValue = (String) jcbStatus.getSelectedItem();
-            
-            if (inputLname.isEmpty() || inputFname.isEmpty() || inputContact.isEmpty() || inputEmail.isEmpty() || 
-            jcbGenValue.equals("Choose your gender") || jcbMonthValue.equals("Months") || 
-            jcbDayValue == 0 || jcbYearValue == 0 || jcbStatusValue.equals("Choose your Status")){
-                
-                JOptionPane.showMessageDialog(this, "Fields cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
-                
+
+            String errorMessage = "Please fill out the following fields to continue: \n";
+            if (inputLname.isEmpty()) errorMessage += "- Last Name\n";
+            if (inputFname.isEmpty()) errorMessage += "- First Name\n";
+            if (inputContact.isEmpty()) errorMessage += "- Contact No.\n";
+            if (inputEmail.isEmpty()) errorMessage += "- Email Address\n";
+            if (jcbGenValue.equals("Choose your gender")) errorMessage += "- Gender\n";
+            if (jcbMonthValue.equals("Months")) errorMessage += "- Birth Month\n";
+            if (jcbDayValue == 0) errorMessage += "- Birth Day\n";
+            if (jcbYearValue == 0) errorMessage += "- Birth Year\n";
+            if (inputCitizenship.isEmpty()) errorMessage += "- Citizenship\n";
+            if (jcbStatusValue.equals("Choose your Status")) errorMessage += "- Status\n";
+
+            if (!errorMessage.equals("Please fill out the following fields to continue: \n")){
+                JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Prevent proceeding
+            }
+
+            // Validate email
+                if (!inputEmail.matches("^[\\w-.]+@[\\w-]+\\.[a-z]{2,3}$")){
+                    JOptionPane.showMessageDialog(this, "Invalid Email Address", "Error", JOptionPane.ERROR_MESSAGE);
+                        return; // Prevent proceeding
+            }
+
+                if (!inputContact.replaceAll("\\s+", "").matches("\\d{10}")) {
+                    JOptionPane.showMessageDialog(this, "Contact No. must be 10 digits!", "Error", JOptionPane.ERROR_MESSAGE);
+                        return; // Prevent proceeding
             }
             
-            
-            
-            
-        }
+            // Validate the birth year is selected
+                if (jcbYearValue == 0){
+                    JOptionPane.showMessageDialog(this, "Please select your birth year", "Error", JOptionPane.ERROR_MESSAGE);
+                        return; // Prevent proceeding
+            }
+
+            // Validate age
+            int currentYear = java.time.Year.now().getValue();
+            int age = currentYear - jcbYearValue;
+            int LEGAL_AGE = 18;
+
+                if (age < LEGAL_AGE){
+                    JOptionPane.showMessageDialog(this, "You must be at least " + LEGAL_AGE + " years old first to apply", "Error", JOptionPane.WARNING_MESSAGE);
+                        return; // Prevent proceeding
+            }
+
+                cardLayout.show(cards, "Last");
+            }
         
     }
-    // e.getActionCommand().equals("Continue")
 
     // Laguna City Search Implementation
     private class LagunaSearch {
@@ -601,12 +679,26 @@ public class accountSetup extends JFrame implements ActionListener {
 
         private void initializeLagunaCities() {
             cities.addAll(Arrays.asList(
-                "Alaminos", "Bay", "Biñan City", "Cabuyao City", "Calamba City", 
-                "Calauan", "Cavinti", "Famy", "Kalayaan", "Liliw",
-                "Los Baños", "Luisiana", "Lumban", "Mabitac", "Magdalena", 
-                "Majayjay", "Nagcarlan", "Paete", "Pagsanjan", "Pakil", 
-                "Pangil", "Pila", "Rizal", "San Pablo City", "San Pedro City", 
-                "Santa Rosa City", "Siniloan", "Victoria"
+                "Alaminos, Pangasinan", "Angeles City, Pampanga", "Antipolo, Rizal", "Bacolod City, Negros Occidental", "Bacoor, Cavite",
+                "Bago, Negros Occidental", "Baguio City, Benguet", "Bais, Negros Oriental", "Balanga, Bataan", "Baliwag, Bulacan",   
+                "Batac, Ilocos Norte", "Batangas City, Batangas", "Bayawan, Negros Oriental", "Baybay, Leyte", "Bayugan, Agusan del Sur",               
+                "Biñan City, Laguna", "Bislig, Surigao del Sur", "Bogo, Cebu", "Borongan, Eastern Samar", "Butuan, Agusan del Norte",
+                "Cabadbaran, Agusan del Norte", "Cabanatuan, Nueva Ecija", "Cabuyao, Laguna", "Cadiz Negros Occidental",
+                "Cagayan de Oro, Misamis Oriental", "Calaca, Batangas", "Calamba City, Laguna", "Calapan, Oriental Mindoro", "Calbayog, Samar",
+                "Caloocan, Metro Manila", "Candon, Ilocos Sur", "Canlaon, Negros Oriental", "Carcar, Cebu", "Carmona, Cavite",  
+                "Catbalogan, Samar", "Cauayan, Isabela", "Cavite City, Cavite", "Cebu City, Cebu", "Cotabato City, Maguindanao del Norte",
+                "Dagupan City, Pangasinan", "Danao, Cebu", "Dapitan, Zamboanga del Norte", "Dasmariñas, Cavite", "Davao City, Davao del Sur",
+                "Digos, Davao del Sur", "Dipolog, Zamboanga del Norte", "Dumaguete Negros Oriental", "El Salvador, Misamis Oriental", 
+                "Escalante Negros Occidental", "Gapan, Nueva Ecija", "General Santos City, South Cotabato", "General Trias, Cavite",   
+                "Gingoog, Misamis Oriental", "Guihulngan, Negros Oriental", "Himamaylan, Negros Occidental",  "Ilagan, Isabela", "Iligan, Lanao del Norte", 
+                "Iloilo City, Iloilo", "Imus, Cavite", "Iriga, Camarinues Sur", "Isabela, Basilan", "Kabankalan, Negros Occidental",
+                "Kidapawan, Cotabato", "Koronadal, South Cotabato", "La Carlota, Negros Occidental", "Lamitan, Basilan", "Laoag, Ilocos Norte",
+                "Lapu-Lapu City, Cebu", "Las Piñas, Metro Manila", "Legazpi City, Albay", "Ligao, Albay", "Lipa City, Batangas", "Lucena, Quezon",
+                "Maasin, Southern Leyte", "Mabalacat, Pampanga", "Makati, Metro Manila", "Malabon, Metro Manila", "Malaybalay, Bukidnon",
+                "Malolos, Bulacan", "Mandaluyong, Metro Manila", "Mandaue City, Cebu", "Manila, Metro Manila", "Marawi, Lanao del Sur",
+                "Marikina, Metro Manila", "Masbate City, Masbate", "Mati, Davao Oriental", "Meycauayan, Bulacan", "Muñoz, Nueva Ecija",
+                "Muntinlupa, Metro Manila"
+               
             ));
         }
 
@@ -650,37 +742,3 @@ public class accountSetup extends JFrame implements ActionListener {
       
 }
 
-
-/*
-Alaminos
-bay
-binan
-cabuyao
-calamba
-calauan
-Cavinti
-Famy
-Kalayaan 
-Liliw
-Los Banos
-Luisiana
-Lumban
-Mabitac
-Magdalena
-Majayjay
-nagcarlan
-paete
-pagsanjan
-pakil
-pangil
-pila
-rizal
-san pablo
-san pedro
-santa cruz
-santa maria
-santa rosa
-siniloan 
-victoria
-
-*/
