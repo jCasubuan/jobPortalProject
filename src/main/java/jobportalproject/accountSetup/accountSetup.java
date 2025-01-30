@@ -6,6 +6,7 @@ package jobportalproject.accountSetup;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.ArrayList;
@@ -19,11 +20,13 @@ import javax.swing.event.DocumentListener;
 public class accountSetup extends JFrame implements ActionListener {
     private JPanel cards, panelAccountSetup, panelNext, panelLastPage;
     private CardLayout cardLayout;
-    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName, txtMiddlename, txtSuffix, txtContactNum, txtEmail, txtCitizenship;
+    private JTextField txtCity, txtPostalCode, txtFirstName, txtLastName, txtMiddlename, txtSuffix, txtContactNum, txtEmail, txtCitizenship, txtDesiredJobs;
     private JPopupMenu cityPopup;
-    private LagunaSearch citySearch;
-    private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName, lblLastName, lblMiddleName, lblSuffix, lblContact, lblRequiredPage2, lblPlusContact, lblEmail, lblGender, lblBirthDate, lblCitizenship, lblStatus, lblPage2;
-    private JButton btnContinue, btnBack, btnBackPage2, btnContinuePage2;
+    private PhilippineCitySearch citySearch;
+    private JLabel hdrBasics, lblInfo, lblCity, lblPostalCode, lblRequired, lblCopy, lblPage, lblHeaderPage2, lblInfoPage2, lblFirstName;
+    private JLabel lblLastName, lblMiddleName, lblSuffix, lblContact, lblRequiredPage2, lblPlusContact, lblEmail, lblGender, lblBirthDate;
+    private JLabel lblCitizenship, lblStatus, lblPage2, lblHeaderPage3, lblInfoPage3, lblDesiredJobs, lblPlaceHolderDesiredJobs, lblRequiredPage3;
+    private JButton btnContinue, btnBack, btnBackPage2, btnContinuePage2, btnSubmit;
     private String[] genders = {"Choose your gender", "Male", "Female", "Others", "Prefer not to say"};
     private Integer[] birthYear = {0, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008,
                                 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990,
@@ -32,13 +35,12 @@ public class accountSetup extends JFrame implements ActionListener {
                                 1953, 1952, 1951, 1950, 1949, 1948, 1947, 1946, 1945, 1944, 1943, 1942, 1941, 1940, 1939, 1938, 1937, 1936,
                                 1935, 1934, 1933, 1932, 1931, 1930, 1929, 1928, 1927, 1926, 1925, 1924, 1923, 1922, 1921, 1920, 1919, 1918,
                                 1917, 1916, 1915, 1914, 1913, 1912, 1911, 1910, 1909, 1908, 1907, 1906, 1905, 1904, 1903, 1902, 1901, 1900};
-    private String[] birthMonth = {"Months", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", 
-                                    "December"};
+    private String[] birthMonth = {"Months", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
     private String[] status = {"Choose your Status", "Single", "Married", "Widowed", "Separated", "Divorced", "Prefer not to disclose"};
     private JComboBox<String> jcbGender, jcbBirthMonth, jcbStatus;
     private JComboBox<Integer> jcbBirthYear, jcbBirthDay;
     
-
+    
     public accountSetup() {
         setTitle("Account Setup");
         setSize(1500, 780);
@@ -74,7 +76,7 @@ public class accountSetup extends JFrame implements ActionListener {
         cards = new JPanel(cardLayout);
 
         // Initialize City Search
-        citySearch = new LagunaSearch();
+        citySearch = new PhilippineCitySearch();
 
         // Create Panels
         panelAccountSetup = createAccountSetupPanel();
@@ -469,6 +471,101 @@ public class accountSetup extends JFrame implements ActionListener {
     private JPanel createLastPanel(){
         JPanel panel = new JPanel(null);
         
+        lblHeaderPage3 = new JLabel("What job are you looking for?");
+        lblHeaderPage3.setFont(new Font("Arial", Font.PLAIN, 30));
+        lblHeaderPage3.setBounds(460, 50, 475, 35);
+        lblHeaderPage3.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblHeaderPage3);
+        
+        lblInfoPage3 = new JLabel("You can always change this later.");
+        lblInfoPage3.setFont(new Font("Arial", Font.PLAIN, 17));
+        lblInfoPage3.setForeground(Color.GRAY);
+        lblInfoPage3.setBounds(455, 90, 350, 20);
+        lblInfoPage3.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblInfoPage3);
+        
+        lblDesiredJobs = new JLabel("Desired job titles* ");
+        lblDesiredJobs.setFont(new Font("Arial", Font.BOLD, 15));
+        //lblDesiredJobs.setForeground(Color.GRAY);
+        lblDesiredJobs.setBounds(505, 190, 350, 20);
+        //lblDesiredJobs.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblDesiredJobs);
+        
+        lblPlaceHolderDesiredJobs = new JLabel("e.g. Cashier, Nurse, Driver");
+        lblPlaceHolderDesiredJobs.setFont(new Font("Arial", Font.PLAIN, 18));
+        lblPlaceHolderDesiredJobs.setForeground(Color.GRAY);
+        lblPlaceHolderDesiredJobs.setBounds(510, 235, 250, 33); // Adjusted Y position
+        panel.add(lblPlaceHolderDesiredJobs);
+
+        txtDesiredJobs = new JTextField();
+        txtDesiredJobs.setBounds(505, 225, 420, 55); // Move text field slightly lower
+        txtDesiredJobs.setFont(new Font("Arial", Font.PLAIN, 16));
+        txtDesiredJobs.setBorder(BorderFactory.createCompoundBorder(txtDesiredJobs.getBorder(), new EmptyBorder(10, 5, 2, 5)));
+        panel.add(txtDesiredJobs);
+
+        // Add Focus and Document Listener
+        txtDesiredJobs.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusGained(FocusEvent e) {
+        lblPlaceHolderDesiredJobs.setFont(new Font("Arial", Font.PLAIN, 13));
+        lblPlaceHolderDesiredJobs.setBounds(510, 223, 250, 25); // Adjusted position for better alignment
+    }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+        if (txtDesiredJobs.getText().trim().isEmpty()) {
+            lblPlaceHolderDesiredJobs.setFont(new Font("Arial", Font.PLAIN, 18));
+            lblPlaceHolderDesiredJobs.setBounds(510, 235, 250, 33); // Adjusted to avoid overlapping
+            }
+        }
+    });
+
+        // Hide placeholder when user types
+        txtDesiredJobs.getDocument().addDocumentListener(new DocumentListener() {
+        private void updatePlaceholder() {
+        lblPlaceHolderDesiredJobs.setVisible(txtDesiredJobs.getText().trim().isEmpty());
+    }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) { updatePlaceholder(); }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) { updatePlaceholder(); }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) { updatePlaceholder(); }
+        
+});
+        
+        lblRequiredPage3 = new JLabel("Required*");
+        lblRequiredPage3.setBounds(200, 300, 120, 35);
+        lblRequiredPage3.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblRequiredPage3);
+        
+        
+        btnSubmit = new JButton("Submit");
+        btnSubmit.setBorder(new LineBorder(new Color(0, 119, 212), 2, true));
+        btnSubmit.setBackground(new Color(0, 119, 212));
+        btnSubmit.setForeground(Color.white);
+        btnSubmit.setFont(new Font("Arial", Font.BOLD, 16));
+        btnSubmit.setBounds(670, 380, 100, 50);
+        btnSubmit.setBorderPainted(false);
+        btnSubmit.setFocusPainted(false);
+        btnSubmit.setOpaque(true);
+        panel.add(btnSubmit);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -668,16 +765,17 @@ public class accountSetup extends JFrame implements ActionListener {
         
     }
 
-    // Laguna City Search Implementation
-    private class LagunaSearch {
+    
+        // Cities in the Philippines
+        private class PhilippineCitySearch {
         private List<String> cities;
 
-        public LagunaSearch() {
+        public PhilippineCitySearch() {
             cities = new ArrayList<>();
-            initializeLagunaCities();
+            initializeCities();
         }
 
-        private void initializeLagunaCities() {
+        private void initializeCities() {
             cities.addAll(Arrays.asList(
                 "Alaminos, Pangasinan", "Angeles City, Pampanga", "Antipolo, Rizal", "Bacolod City, Negros Occidental", "Bacoor, Cavite",
                 "Bago, Negros Occidental", "Baguio City, Benguet", "Bais, Negros Oriental", "Balanga, Bataan", "Baliwag, Bulacan",   
@@ -689,7 +787,7 @@ public class accountSetup extends JFrame implements ActionListener {
                 "Catbalogan, Samar", "Cauayan, Isabela", "Cavite City, Cavite", "Cebu City, Cebu", "Cotabato City, Maguindanao del Norte",
                 "Dagupan City, Pangasinan", "Danao, Cebu", "Dapitan, Zamboanga del Norte", "Dasmariñas, Cavite", "Davao City, Davao del Sur",
                 "Digos, Davao del Sur", "Dipolog, Zamboanga del Norte", "Dumaguete Negros Oriental", "El Salvador, Misamis Oriental", 
-                "Escalante Negros Occidental", "Gapan, Nueva Ecija", "General Santos City, South Cotabato", "General Trias, Cavite",   
+                "Escalante, Negros Occidental", "Gapan, Nueva Ecija", "General Santos City, South Cotabato", "General Trias, Cavite",   
                 "Gingoog, Misamis Oriental", "Guihulngan, Negros Oriental", "Himamaylan, Negros Occidental",  "Ilagan, Isabela", "Iligan, Lanao del Norte", 
                 "Iloilo City, Iloilo", "Imus, Cavite", "Iriga, Camarinues Sur", "Isabela, Basilan", "Kabankalan, Negros Occidental",
                 "Kidapawan, Cotabato", "Koronadal, South Cotabato", "La Carlota, Negros Occidental", "Lamitan, Basilan", "Laoag, Ilocos Norte",
@@ -697,9 +795,21 @@ public class accountSetup extends JFrame implements ActionListener {
                 "Maasin, Southern Leyte", "Mabalacat, Pampanga", "Makati, Metro Manila", "Malabon, Metro Manila", "Malaybalay, Bukidnon",
                 "Malolos, Bulacan", "Mandaluyong, Metro Manila", "Mandaue City, Cebu", "Manila, Metro Manila", "Marawi, Lanao del Sur",
                 "Marikina, Metro Manila", "Masbate City, Masbate", "Mati, Davao Oriental", "Meycauayan, Bulacan", "Muñoz, Nueva Ecija",
-                "Muntinlupa, Metro Manila"
+                "Muntinlupa, Metro Manila", "Naga, Camarines Sur", "Naga, Cebu", "Navotas, Metro Manila", "Olongapo, Zambales", "Ormoc, Leyte",
+                "Oroquieta, Misamis Occidental", "Pagadian, Zamboanga del Sur", "Palayan, Nueva Ecija", "Panabo, Davao del Norte", "Parañaque, Metro Manila",
+                "Pasay, Metro Manila", "Passi, Iloilo", "Puerto Princesa, Palawan", "Quezon City, Metro Manila", "Roxas, Capiz", "Saqay, Negros Occidental",
+                "Samal, Davao del Norte", "San carlos, Negros Occidental", "San Carlos, Pangasinan", "San Fernando, La Union", "San Fernando, Pampanga",
+                "San Jose, Nueva Ecija", "San Jose del Monte, Bulacan", "San Juan, Metro Manila", "San Pablo, Laguna", "San Pedro, Laguna",
+                "Santa Rosa, Laguna", "Santo Tomas, Batangas", "Santiago, Isabela", "Silay, Negros Occidental", "Sipalay, Negros Occidental",
+                "Sorsogon City, Sorsogon", "Surigao City, Surigao del Norte", "Tabaco, Albay", "Tabuc, Kalinga", "Tacloban, Leyte", "Tacurong, Sultan Kudarat",
+                "Tagaytay, Cavite", "Tagbilaran, Bohol", "Taguig, Metro Manila", "Tagum, Davao del Norte", "Talisay, Cebu", "Talisay, Negros Occidental",
+                "Tanauan, Batangas", "Tandag, Surigao del Sur", "Tangub, Misamis Occidental", "Tanjay, Negros Oriental", "Tarlac City, Tarlac",
+                "Tayabas, Quezon", "Toledo, Cebu", "Trece Martires, Cavite", "Tuguegarao, Cagayan", "Urdaneta, Pangasinan", "Valencia, Bukidnon",
+                "Valenzuela, Metro Manila", "Victorias, Negros Occidental", "Vigan, Ilocos Sur", "Zamboanga City, Zamboanga del Sur"
                
             ));
+
+                
         }
 
         public List<String> searchCities(String prefix) {
@@ -712,7 +822,10 @@ public class accountSetup extends JFrame implements ActionListener {
         }
 
     }
+
     
+        
+        
      public static String formatPhoneNumber(String input) {
         // Only remove spaces and non-digits
         String cleaned = input.replaceAll("[^0-9]", "");
@@ -739,6 +852,8 @@ public class accountSetup extends JFrame implements ActionListener {
         
         return formatted.toString();
     }
+     
+     
       
 }
 
